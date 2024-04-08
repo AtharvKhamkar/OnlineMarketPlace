@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt");
 const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
 const asyncHandler = require("../utils/asyncHandler");
+const { uploadOnCloudinary } = require("../utils/cloudinary");
 
 const getAllCustomers = asyncHandler(async (req, res) => {
     const result = await pool.query(customer.getAllCustomers);
@@ -32,9 +33,22 @@ const addCustomer = asyncHandler(async (req, res) => {
         throw new ApiError(401, "User is already registered");
     }
 
+    const avatarLocalPath = req.files?.avatar[0]?.path;
+    if (!avatarLocalPath) {
+        throw new ApiError(400, "Avatar file is required");
+    }
+
+    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    
+    if (!avatar) {
+        throw new ApiError(401, "Error while uploading the avatar file");
+    }
+
+
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const query = customer.addCustomer;
-    const values = [first_name, last_name, email, company, street, city, state, zip, phone, birth_data, sex,hashedPassword];
+    const values = [first_name, last_name, email, company, street, city, state, zip, phone, birth_data, sex,hashedPassword,avatar.url];
     const result = await pool.query(query, values);
 
     if (!result) {

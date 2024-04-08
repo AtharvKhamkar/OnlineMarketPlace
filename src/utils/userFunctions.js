@@ -12,6 +12,7 @@ const isPasswordCorrect = async (email, password) => {
             throw new ApiError(400, "Please register first");
         }
         const hashedPassword = result.rows[0].password;
+        
         return await bcrypt.compare(password, hashedPassword);
     } catch (error) {
         throw new ApiError(400, `${error.message}`);

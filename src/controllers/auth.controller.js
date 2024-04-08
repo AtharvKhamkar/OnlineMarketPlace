@@ -1,6 +1,7 @@
 const asyncHandler = require("../utils/asyncHandler");
 const ApiResponse = require("../utils/ApiResponse");
 const ApiError = require("../utils/ApiError");
+const bcrypt = require("bcrypt");
 const auth = require("../query/auth.query");
 const customer = require("../query/customer.query");
 const pool = require("../config/database");
@@ -71,4 +72,27 @@ const logout = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "User logged out"));
 })
 
-module.exports = { login,logout };
+const changePassword = asyncHandler(async (req, res) => {
+    //verify user first using verifyJWT middleware
+    //compare new password with existing password
+    //If password is correct then hash new password and update password with that hashed password
+
+    const {oldPassword,newPassword} = req.body
+    const customer = req.customer;
+
+    const checkPassword = await isPasswordCorrect(customer?.email, oldPassword);
+    if (!checkPassword) {
+        throw new ApiError(400, "Password is incorrect");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const result = await pool.query(auth.updatePassword, [hashedPassword, customer?.id]);
+    if (!result.rows.length) {
+        throw new ApiError(400, "Error while updating the password");
+    }
+
+    return res.status(200)
+        .json(new ApiResponse(200, {}, "Password updated successfully"));
+})
+
+module.exports = { login,logout,changePassword };

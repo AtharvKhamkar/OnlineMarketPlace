@@ -6,4 +6,9 @@ const removeRefreshToken = `UPDATE customer
                             SET refresh_token = $1
                             WHERE id = $2 RETURNING *`;
 
-module.exports = { addRefreshToken,removeRefreshToken };
+
+const updatePassword = `UPDATE customer 
+                        SET password = $1 
+                        WHERE id = $2 RETURNING *`;
+
+module.exports = { addRefreshToken,removeRefreshToken,updatePassword };
