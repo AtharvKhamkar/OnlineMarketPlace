@@ -3,8 +3,10 @@ const { getAllCustomers,
     addCustomer,
     getCustomer,
     updateCustomerDetails,
-    removeCustomer } = require("../controllers/customer.controller");
-const {upload} = require("../middlewares/multer.middleware");
+    removeCustomer, 
+    allCustomerOrders} = require("../controllers/customer.controller");
+const { upload } = require("../middlewares/multer.middleware");
+const verifyJWT = require("../middlewares/auth.middleware");
 
 const router = Router();
 
@@ -18,5 +20,6 @@ router.route("/add").post(upload.fields([
 router.route("/:id").get(getCustomer);
 router.route("/update/:id").put(updateCustomerDetails);
 router.route("/remove/:id").delete(removeCustomer);
+router.route("/orders/:id").get(upload.none(),allCustomerOrders);
 
 module.exports = router;

@@ -156,6 +156,25 @@ const removeCustomer = asyncHandler(async (req, res) => {
     }
 
 })
+
+const allCustomerOrders = asyncHandler(async (req, res) => {
+    
+    const  id  = parseInt(req.params?.id);
+  
+    const orders = await pool.query(customer.customerOrders, [id]);
+    if (!orders.rows.length) {
+        throw new ApiError(400, "Error while getting customer orders");
+    }
+
+    return res.status(200)
+        .json(
+            new ApiResponse(
+                200,
+                orders.rows,
+                "Successfully fetched all the customers"
+        )
+    )
+})
     
 
 
@@ -164,5 +183,6 @@ module.exports = {
     addCustomer,
     getCustomer,
     updateCustomerDetails,
-    removeCustomer
+    removeCustomer,
+    allCustomerOrders
 }

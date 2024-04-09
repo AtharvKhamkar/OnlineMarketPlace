@@ -5,6 +5,12 @@ const getCustomer = "SELECT * FROM customer WHERE id = $1";
 const updateCustomerDetails = "UPDATE customer SET first_name = $1, last_name=$2, email=$3, company=$4, street=$5, city=$6, state=$7, zip=$8, phone=$9, birth_date=$10,sex=$11 WHERE id = $12 RETURNING *";
 const removeCustomer = "DELETE FROM customer WHERE id = $1 RETURNING *";
 
+const customerOrders = `SELECT *
+                        FROM sales_item i
+                        INNER JOIN sales_order o
+                        ON i.sales_order_id = o.id
+                        WHERE o.cust_id = $1;`
+
 
 module.exports = {
     getAllCustomers,
@@ -12,5 +18,6 @@ module.exports = {
     checkCustomerByEmail,
     getCustomer,
     updateCustomerDetails,
-    removeCustomer
+    removeCustomer,
+    customerOrders
 }
